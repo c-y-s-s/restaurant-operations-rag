@@ -38,6 +38,7 @@ git push -u origin main
 1. 登入 Render 並選擇 **New → Blueprint**。
 2. 連接 GitHub repository。
 3. Render 會讀取根目錄的 `render.yaml`，建立 `restaurant-rag-api`。
+   Blueprint 已明確設定 `plan: free`。建立前請在 Estimated pricing 確認服務顯示 Free／US$0；如果畫面仍顯示 Starter US$7，先不要按 Create。
 4. 設定以下環境變數：
 
 | 名稱 | 值 |
