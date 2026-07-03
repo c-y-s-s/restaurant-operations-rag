@@ -84,9 +84,14 @@ function citationSourceIds(response: ChatResponse) {
 <template>
   <main class="page-shell">
     <header class="site-header">
-      <div class="brand-mark" aria-hidden="true">S</div>
-      <div>
-        <p class="eyebrow">SERVICE NOTES</p>
+      <div class="brand-lockup">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 40 40" role="presentation">
+            <circle cx="20" cy="20" r="8" />
+            <circle cx="20" cy="20" r="5" />
+            <path d="M8 11v7m-2-7v5c0 2 1 3 2 3s2-1 2-3v-5m-2 8v10M31 11c-2 3-2 6 0 8v10" />
+          </svg>
+        </div>
         <h1>餐廳營運助手</h1>
       </div>
       <span class="status-pill" :class="serviceStatus"><span /> {{ serviceLabel }}</span>
@@ -94,19 +99,33 @@ function citationSourceIds(response: ChatResponse) {
 
     <section class="workspace" aria-label="餐廳營運問答">
       <div v-if="turns.length === 0" class="welcome">
-        <p class="eyebrow">INTERNAL KNOWLEDGE</p>
-        <h2>今天需要確認什麼？</h2>
-        <p>詢問菜單過敏原、設備操作或分店 SOP。回答只會採用內部文件，並附上可展開的原文依據。</p>
+        <div class="welcome-intro">
+          <div class="restaurant-motif" aria-hidden="true">
+            <span />
+            <svg viewBox="0 0 64 34" role="presentation">
+              <path d="M10 27h44M15 25c1-11 7-17 17-17s16 6 17 17M28 7c0-2 1-3 4-3s4 1 4 3" />
+            </svg>
+            <span />
+          </div>
+          <h2>餐廳營運查詢</h2>
+          <p>詢問菜單過敏原、設備操作或分店流程，回答會附上內部文件來源。</p>
+        </div>
 
-        <div class="example-grid" aria-label="範例問題">
-          <button
-            v-for="example in examples"
-            :key="example"
-            type="button"
-            @click="submit(example)"
-          >
-            <span>{{ example }}</span><span aria-hidden="true">↗</span>
-          </button>
+        <div class="prompt-board">
+          <div class="prompt-board-heading">
+            <span>常用問題</span>
+          </div>
+          <div class="example-grid" aria-label="範例問題">
+            <button
+              v-for="example in examples"
+              :key="example"
+              type="button"
+              @click="submit(example)"
+            >
+              <span>{{ example }}</span>
+              <span aria-hidden="true">→</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -133,7 +152,7 @@ function citationSourceIds(response: ChatResponse) {
             <p v-if="turn.response.reason" class="reason">{{ turn.response.reason }}</p>
 
             <div v-if="turn.response.citations.length" class="citations">
-              <p class="citation-label">引用來源 {{ turn.response.citations.length }}</p>
+              <p class="citation-label">文件依據 · {{ turn.response.citations.length }} 筆</p>
               <details v-for="(citation, index) in turn.response.citations" :key="citation.chunk_id">
                 <summary>
                   <span class="citation-number">{{ index + 1 }}</span>
@@ -185,10 +204,10 @@ function citationSourceIds(response: ChatResponse) {
         </label>
         <button class="send-button" type="submit" :disabled="loading || question.trim().length < 2">
           <span class="sr-only">送出問題</span>
-          <span aria-hidden="true">↑</span>
+          <span aria-hidden="true">→</span>
         </button>
       </form>
-      <p class="disclaimer">AI 可能出錯；涉及食安或緊急事件時，請依原始 SOP 與值班主管指示處理。</p>
+      <p class="disclaimer">內容依內部文件檢索生成；涉及食安或緊急事件時，仍以原始 SOP 與值班主管指示為準。</p>
     </section>
   </main>
 </template>

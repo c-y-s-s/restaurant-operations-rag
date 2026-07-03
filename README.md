@@ -4,6 +4,14 @@
 
 A citation-first, Traditional Chinese RAG portfolio project for restaurant employees. It retrieves fictional menu, safety, equipment, and branch SOP documents; answers only from retrieved evidence; and exposes every supporting source to the user.
 
+## Live demo
+
+- Web: [restaurant-operations-rag.vercel.app](https://restaurant-operations-rag.vercel.app/)
+- API health: [restaurant-rag-api.onrender.com/health](https://restaurant-rag-api.onrender.com/health)
+- Interactive API docs: [restaurant-rag-api.onrender.com/docs](https://restaurant-rag-api.onrender.com/docs)
+
+The public API runs on a free Render instance and can require a short cold start after being idle.
+
 ## What this demonstrates
 
 - A custom ingestion and retrieval pipeline without LangChain or hosted file search

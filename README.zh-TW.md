@@ -4,6 +4,14 @@
 
 這是一個以可靠引用為核心、使用繁體中文操作的餐廳營運 RAG 作品。系統會檢索虛構的菜單、食品安全、設備操作與分店 SOP 文件，只根據找到的證據回答，並向使用者呈現實際引用來源。
 
+## 線上展示
+
+- 前端：[restaurant-operations-rag.vercel.app](https://restaurant-operations-rag.vercel.app/)
+- API 健康檢查：[restaurant-rag-api.onrender.com/health](https://restaurant-rag-api.onrender.com/health)
+- 互動式 API 文件：[restaurant-rag-api.onrender.com/docs](https://restaurant-rag-api.onrender.com/docs)
+
+公開 API 使用 Render Free instance，閒置後第一次開啟可能需要短暫等待冷啟動。
+
 ## 作品展示重點
 
 - 不使用 LangChain 或託管式 File Search，自行實作文件匯入與檢索流程
