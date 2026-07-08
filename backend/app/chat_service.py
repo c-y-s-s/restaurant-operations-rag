@@ -53,6 +53,7 @@ class ChatService:
             return response
 
         context_chunks = retrieved[: self.settings.generation_context_chunks]
+        
         draft, input_tokens, output_tokens = await self.openai.answer(
             question, branch_id, context_chunks
         )

@@ -37,3 +37,32 @@ export interface ConversationTurn {
   response?: ChatResponse
   error?: string
 }
+
+export interface EvaluationCaseResult {
+  id: string
+  question: string
+  branch_id: string
+  expected_documents: string[]
+  retrieved_documents: string[]
+  retrieval_passed: boolean | null
+  should_abstain: boolean
+  abstained: boolean
+  abstention_passed: boolean
+  citation_validity_passed: boolean
+  cited_documents: string[]
+  answer: string
+  reason: string | null
+  latency_ms: number
+  overall_passed: boolean
+}
+
+export interface EvaluationSummary {
+  run_id: string | null
+  created_at: string | null
+  cases: number
+  recall_at_5: number
+  correct_abstention_rate: number
+  citation_validity_rate: number
+  average_latency_ms: number
+  results: EvaluationCaseResult[]
+}
