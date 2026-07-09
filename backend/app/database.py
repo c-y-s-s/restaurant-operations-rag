@@ -209,10 +209,15 @@ class Database:
                     """
                     insert into evaluation_runs
                       (cases, recall_at_5, correct_abstention_rate,
-                       citation_validity_rate, average_latency_ms, model)
+                       citation_validity_rate, answer_correctness_rate, average_latency_ms,
+                       p50_latency_ms, p95_latency_ms, total_input_tokens, total_output_tokens,
+                       estimated_cost_usd, model)
                     values
                       (%(cases)s, %(recall_at_5)s, %(correct_abstention_rate)s,
-                       %(citation_validity_rate)s, %(average_latency_ms)s, %(model)s)
+                       %(citation_validity_rate)s, %(answer_correctness_rate)s,
+                       %(average_latency_ms)s, %(p50_latency_ms)s, %(p95_latency_ms)s,
+                       %(total_input_tokens)s, %(total_output_tokens)s,
+                       %(estimated_cost_usd)s, %(model)s)
                     returning id
                     """,
                     values,
@@ -226,15 +231,17 @@ class Database:
                               (evaluation_run_id, case_id, question, branch_id,
                                expected_documents, retrieved_documents, retrieval_passed,
                                should_abstain, abstained, abstention_passed,
-                               citation_validity_passed, cited_documents, answer, reason,
-                               latency_ms, overall_passed)
+                               citation_validity_passed, answer_correctness_passed,
+                               matched_keywords, missing_keywords, cited_documents, answer,
+                               reason, latency_ms, overall_passed)
                             values
                               (%(evaluation_run_id)s, %(case_id)s, %(question)s, %(branch_id)s,
                                %(expected_documents)s, %(retrieved_documents)s,
                                %(retrieval_passed)s, %(should_abstain)s, %(abstained)s,
                                %(abstention_passed)s, %(citation_validity_passed)s,
-                               %(cited_documents)s, %(answer)s, %(reason)s, %(latency_ms)s,
-                               %(overall_passed)s)
+                               %(answer_correctness_passed)s, %(matched_keywords)s,
+                               %(missing_keywords)s, %(cited_documents)s, %(answer)s,
+                               %(reason)s, %(latency_ms)s, %(overall_passed)s)
                             """,
                             [{**result, "evaluation_run_id": run_id} for result in results],
                         )
@@ -249,7 +256,9 @@ class Database:
             run = connection.execute(
                 """
                 select id as run_id, created_at, cases, recall_at_5,
-                  correct_abstention_rate, citation_validity_rate, average_latency_ms
+                  correct_abstention_rate, citation_validity_rate,
+                  answer_correctness_rate, average_latency_ms, p50_latency_ms,
+                  p95_latency_ms, total_input_tokens, total_output_tokens, estimated_cost_usd
                 from evaluation_runs
                 order by created_at desc
                 limit 1
@@ -261,8 +270,9 @@ class Database:
                 """
                 select case_id as id, question, branch_id, expected_documents,
                   retrieved_documents, retrieval_passed, should_abstain, abstained,
-                  abstention_passed, citation_validity_passed, cited_documents,
-                  answer, reason, latency_ms, overall_passed
+                  abstention_passed, citation_validity_passed, answer_correctness_passed,
+                  matched_keywords, missing_keywords, cited_documents, answer, reason,
+                  latency_ms, overall_passed
                 from evaluation_case_results
                 where evaluation_run_id = %s
                 order by evaluation_case_results.id

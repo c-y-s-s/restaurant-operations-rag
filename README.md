@@ -20,7 +20,7 @@ The public API runs on a free Render instance and can require a short cold start
 - OpenAI Responses API with Pydantic Structured Outputs
 - Application-side citation validation and explicit abstention
 - Transactional citation snapshots that remain auditable after source re-ingestion
-- Branch metadata filtering, rate limiting, usage logging, and a reproducible 31-case evaluation set
+- Branch metadata filtering, rate limiting, usage logging, and a reproducible 25-case core evaluation set
 - A deliberately small Nuxt 3 interface suitable for a live interview demo
 
 ## Why this project exists
@@ -90,7 +90,7 @@ curl http://localhost:8000/chat \
   -d '{"question":"台北店星期六最後點餐幾點？","branch_id":"taipei"}'
 ```
 
-Run a small evaluation smoke test before running all 31 paid cases:
+Run a small evaluation smoke test before running all 25 paid cases:
 
 ```bash
 curl http://localhost:8000/evaluations/run \
@@ -134,13 +134,15 @@ The current baseline weights semantic similarity at `0.72` and lexical relevance
 
 ## Evaluation
 
-The fixed dataset in `backend/evals/cases.json` contains 31 cases covering direct answers, paraphrases, exact facts, branch isolation, unsupported questions, compound questions, and abstention. The automated endpoint reports:
+The fixed dataset in `backend/evals/cases.json` contains 25 core cases covering direct answers, paraphrases, exact facts, branch isolation, unsupported questions, compound questions, and abstention. The automated endpoint reports:
 
 - Recall@5 for the expected source document
 - Correct abstention rate
 - Citation validity rate
-- Average end-to-end latency
-- Per-case retrieved and cited documents, pass/fail flags, answer, reason, and latency
+- Keyword-based answer correctness
+- Average, P50, and P95 end-to-end latency
+- Total input/output tokens and estimated model cost
+- Per-case retrieved and cited documents, pass/fail flags, answer, reason, missing keywords, and latency
 
 Save a complete run for later review:
 
@@ -151,7 +153,7 @@ curl http://localhost:8000/evaluations/run \
   -d '{}' > docs/evaluation-results-latest.json
 ```
 
-`retrieval_passed` is `null` for unsupported cases that do not declare an expected source. `overall_passed` combines retrieval (when applicable), abstention, and citation validity; it does not yet judge semantic answer correctness.
+`retrieval_passed` is `null` for unsupported cases that do not declare an expected source. `answer_correctness_passed` is `null` for cases that should abstain. `overall_passed` combines retrieval (when applicable), abstention, citation validity, and keyword-based answer correctness.
 
 Each run is saved transactionally to Supabase. `evaluation_runs` stores the summary and model, while `evaluation_case_results` stores every case. The response includes a `run_id`; if either insert fails, the whole run is rolled back. Retrieve the newest saved run with:
 
@@ -164,13 +166,14 @@ curl http://localhost:8000/evaluations/latest \
 
 | Metric | Result |
 |---|---:|
-| Cases passing automated criteria | 31 / 31 |
+| Cases passing automated criteria | 25 / 25 |
 | Recall@5 | 100% |
 | Correct abstention rate | 100% |
 | Citation validity rate | 100% |
-| Average end-to-end latency | 4,588 ms |
+| Keyword answer correctness | 100% |
+| Average end-to-end latency | 5,756 ms |
 
-These scores cover retrieval, abstention, and citation integrity. They do not claim 100% semantic answer accuracy. See [`docs/evaluation-report.md`](docs/evaluation-report.md) for definitions and limitations.
+The current run also reports P50/P95 latency, token totals, and estimated cost. Keyword checks verify expected facts such as temperatures, times, and required actions; they are deterministic portfolio-quality signals, not a full semantic judge. See [`docs/evaluation-report.md`](docs/evaluation-report.md) for definitions and limitations.
 
 An initial 29-question exploratory run on July 1, 2026 produced the following operational snapshot. It is included as a baseline rather than a final benchmark because answer correctness still requires labelled expected answers or human review.
 
@@ -192,7 +195,7 @@ When investigating a failed case, use this order:
 ```text
 Expected chunk missing from top 8       -> retrieval problem
 Expected chunk retrieved but not top 5  -> ranking/context selection problem
-Expected chunk present in model context -> prompt or generation problem
+Expected chunk present in model context but keyword missing -> prompt or generation problem
 Answer supported but citation incorrect -> citation mapping problem
 Unsupported answer was generated        -> abstention problem
 ```
@@ -204,7 +207,7 @@ Unsupported answer was generated        -> abstention problem
 - Conflict handling can only be evaluated when both contradictory chunks are retrieved into the model context.
 - Ingestion replaces a changed document's chunks, so their UUIDs can change. Historical citation text remains available through immutable snapshots.
 - The in-memory per-IP rate limiter is suitable for a single demo instance, not horizontally scaled production deployment.
-- Evaluation currently measures retrieval, abstention, citation validity, and latency; fully automated semantic answer correctness remains future work.
+- Evaluation currently uses deterministic expected-keyword checks for answer correctness. This catches missing facts, but it is not a full semantic equivalence judge.
 
 Investigation notes and regression decisions are recorded in [`docs/experiment-log.md`](docs/experiment-log.md).
 

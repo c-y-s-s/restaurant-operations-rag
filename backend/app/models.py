@@ -104,7 +104,13 @@ class EvaluationSummary(BaseModel):
     recall_at_5: float
     correct_abstention_rate: float
     citation_validity_rate: float
+    answer_correctness_rate: float | None = None
     average_latency_ms: float
+    p50_latency_ms: float | None = None
+    p95_latency_ms: float | None = None
+    total_input_tokens: int | None = None
+    total_output_tokens: int | None = None
+    estimated_cost_usd: float | None = None
     results: list["EvaluationCaseResult"] = Field(default_factory=list)
 
 
@@ -119,6 +125,9 @@ class EvaluationCaseResult(BaseModel):
     abstained: bool
     abstention_passed: bool
     citation_validity_passed: bool
+    answer_correctness_passed: bool | None = None
+    matched_keywords: list[str] = Field(default_factory=list)
+    missing_keywords: list[str] = Field(default_factory=list)
     cited_documents: list[str]
     answer: str
     reason: str | None

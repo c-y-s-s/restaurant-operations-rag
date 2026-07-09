@@ -20,7 +20,7 @@
 - 使用 OpenAI Responses API 與 Pydantic Structured Outputs
 - 後端驗證引用並在資料不足時明確拒答
 - 以 transaction 保存 citation snapshot，重新匯入文件後仍可追溯歷史引用
-- 支援分店資料隔離、rate limit、使用紀錄與可重複執行的 31 題評估集
+- 支援分店資料隔離、rate limit、使用紀錄與可重複執行的 25 題核心評估集
 - 使用 Nuxt 3 製作簡潔、適合面試展示的聊天介面
 
 ## 專案目的
@@ -90,7 +90,7 @@ curl http://localhost:8000/chat \
   -d '{"question":"台北店星期六最後點餐幾點？","branch_id":"taipei"}'
 ```
 
-在執行全部 31 題的付費評估前，可以先執行 3 題 smoke test：
+在執行全部 25 題的付費評估前，可以先執行 3 題 smoke test：
 
 ```bash
 curl http://localhost:8000/evaluations/run \
@@ -132,13 +132,15 @@ Nuxt UI
 
 ## 評估
 
-`backend/evals/cases.json` 包含 31 題固定測試，涵蓋直接回答、換句話問、精確資訊、分店隔離、無資料問題、複合問題與拒答。自動評估端點會輸出：
+`backend/evals/cases.json` 包含 25 題核心固定測試，涵蓋直接回答、換句話問、精確資訊、分店隔離、無資料問題、複合問題與拒答。自動評估端點會輸出：
 
 - 預期文件的 Recall@5
 - 正確拒答率
 - 引用有效率
-- 平均端到端延遲
-- 每題的檢索與引用文件、通過狀態、回答、原因及延遲
+- 以預期關鍵字判斷的回答正確性
+- 平均、P50 與 P95 端到端延遲
+- 輸入/輸出 token 總量與模型成本估算
+- 每題的檢索與引用文件、通過狀態、回答、原因、缺少關鍵字及延遲
 
 完整執行結果可以保存供後續比較：
 
@@ -149,7 +151,7 @@ curl http://localhost:8000/evaluations/run \
   -d '{}' > docs/evaluation-results-latest.json
 ```
 
-沒有預期來源的拒答題，其 `retrieval_passed` 為 `null`。`overall_passed` 會合併檢索（適用時）、拒答與引用驗證結果，但目前尚未判斷回答內容的語意正確性。
+沒有預期來源的拒答題，其 `retrieval_passed` 為 `null`。應拒答題的 `answer_correctness_passed` 為 `null`。`overall_passed` 會合併檢索（適用時）、拒答、引用驗證與 expected keywords 回答正確性。
 
 每次執行結果都會透過單一 transaction 保存到 Supabase。`evaluation_runs` 保存摘要與模型，`evaluation_case_results` 保存每一題；任一步寫入失敗時整次 rollback。回應中的 `run_id` 可用來稽核該次評估。查詢最近一次紀錄：
 
@@ -162,13 +164,14 @@ curl http://localhost:8000/evaluations/latest \
 
 | 指標 | 結果 |
 |---|---:|
-| 通過自動條件 | 31 / 31 |
+| 通過自動條件 | 25 / 25 |
 | Recall@5 | 100% |
 | 正確拒答率 | 100% |
 | Citation validity | 100% |
-| 平均端到端延遲 | 4,588 ms |
+| Keyword answer correctness | 100% |
+| 平均端到端延遲 | 5,756 ms |
 
-這些數字衡量檢索、拒答與引用完整性，不代表回答語意正確率為 100%。詳細定義與限制請參考 [`docs/evaluation-report.md`](docs/evaluation-report.md)。
+目前 evaluation run 會回報 keyword-based answer correctness、P50/P95 latency、token 總量與成本估算。關鍵字檢查用來驗證溫度、時間、必要動作等預期事實；它是可重現的作品集品質訊號，不等同完整語意評分。詳細定義與限制請參考 [`docs/evaluation-report.md`](docs/evaluation-report.md)。
 
 2026 年 7 月 1 日執行的初步 29 題人工探索測試得到以下結果。這是基準快照而非最終 benchmark，因為回答正確率仍需要標註好的預期答案或人工審查。
 
@@ -190,7 +193,7 @@ curl http://localhost:8000/evaluations/latest \
 ```text
 正確 chunk 沒進入 top 8       -> Retrieval 問題
 正確 chunk 進入 top 8 但不是 top 5 -> 排序或 Context 選擇問題
-正確 chunk 已進入模型 Context -> Prompt 或 Generation 問題
+正確 chunk 已進入模型 Context 但缺少關鍵字 -> Prompt 或 Generation 問題
 回答有根據但引用錯誤          -> Citation Mapping 問題
 沒有資料卻仍然回答            -> Abstention 問題
 ```
@@ -202,7 +205,7 @@ curl http://localhost:8000/evaluations/latest \
 - 只有當兩個互相衝突的 chunks 都進入模型 context 時，才能真正測試來源衝突處理。
 - 文件內容變更後重新匯入會替換原本 chunks，因此 UUID 可能改變；歷史引用內容會透過 snapshot 保留。
 - 記憶體內的 per-IP rate limiter 適合單機 Demo，不適合水平擴展的正式環境。
-- 目前自動評估涵蓋檢索、拒答、引用與延遲；完整的語意回答正確率仍是後續工作。
+- 目前自動評估以 deterministic expected keywords 檢查回答正確性，可抓出缺少事實的回答，但不等同完整語意等價判斷。
 
 問題調查與回歸測試決策記錄於 [`docs/experiment-log.md`](docs/experiment-log.md)。
 

@@ -168,3 +168,61 @@ System Prompt 要求來源互相衝突時設定 `abstained=true`。測試確認 
 - 3 題 smoke run 成功保存摘要與 3 筆 case results。
 - 從資料庫讀回的 latest run 與回傳 `run_id` 完全一致。
 - Smoke run：`1e8915cc-12cf-4cd5-995d-01bcd9c1b5d5`。
+
+## EXP-009：加入 deterministic answer correctness
+
+### 問題
+
+原本 evaluation 能確認檢索來源、拒答與 citation validity，但無法判斷回答是否真的包含預期事實。例如找對文件且引用合法，仍可能漏答溫度、時間或必要處理步驟。
+
+### 決策
+
+先採用 `expected_keywords`，不使用 exact answer match 或 LLM judge。
+
+- exact match 對繁體中文措辭太脆弱，模型換句話就可能誤判。
+- LLM judge 較接近語意評分，但成本較高，且需要另外驗證 judge prompt 的穩定性。
+- expected keywords 可重現、成本低、容易在面試中解釋，也能逼迫每個非拒答案例標註必要事實。
+
+### 修正
+
+- 每個非拒答案例新增 2 至 5 個 `expected_keywords`。
+- `/evaluations/run` 新增 `answer_correctness_rate`、逐題 matched/missing keywords、P50/P95 latency、token totals 與 estimated cost。
+- `overall_passed` 現在同時要求 retrieval、abstention、citation validity 與 answer correctness 通過。
+- 前端 evaluation 頁顯示 answer correctness、延遲分布、token/cost 與缺少的關鍵字。
+
+### 已知限制
+
+Keyword correctness 可抓出缺少關鍵事實的回答，但無法完整判斷同義改寫、否定語意或答案是否過度延伸。若之後要提高嚴謹度，可加入結構化 expected facts 或 LLM judge 作為第二層評估。
+
+## EXP-010：將評估集收斂為 25 題核心案例
+
+### 問題
+
+將評估集擴到 50 題後，覆蓋面增加，但完整 run 需要更久，且部分題目只是重複檢查相似能力。對作品集與面試展示而言，過大的同步 evaluation 會讓等待時間變長，也讓報告焦點變鬆散。
+
+### 決策
+
+將固定評估集收斂為 25 題核心案例，保留最能展示 RAG 工程能力的類型：
+
+- 過敏原、菜單製作、食品安全與設備操作
+- 緊急應變、客訴、訂位、打烊與開店流程
+- 台北/台中分店專屬文件與分店隔離
+- POS 與員工衛生
+- 複合問題與無資料拒答
+
+### 驗證結果（2026-07-08）
+
+- 案例：25 題
+- Recall@5：100%
+- 正確拒答率：100%
+- Citation validity：100%
+- Keyword answer correctness：100%
+- 自動條件通過：25/25
+- 平均端到端延遲：5,756 ms
+- P50 / P95：4,994 ms / 8,287 ms
+- Token：34,664 input / 4,581 output
+- Estimated cost：US$0.017828
+
+### 後續
+
+完整 evaluation 仍是同步 API。若案例數再次增加，應改為背景任務、分批執行或加入進度查詢，避免單次請求受到外部模型與資料庫連線延遲影響。

@@ -2,8 +2,8 @@
 
 ## 正式執行結果
 
-- 執行日期：2026-07-01
-- 測試案例：31 題
+- 執行日期：2026-07-08
+- 測試案例：25 題核心案例
 - 模型：`gpt-5.4-mini`
 - Embedding：`text-embedding-3-small`
 - Retrieval：Hybrid Search，top 5 評估
@@ -15,17 +15,23 @@
 | Recall@5 | 100% |
 | 正確拒答率 | 100% |
 | Citation validity | 100% |
-| 自動條件整體通過 | 31 / 31 |
-| 平均端到端延遲 | 4,588 ms |
-| 最快案例 | 2,506 ms |
-| 最慢案例 | 6,435 ms |
+| Keyword answer correctness | 100% |
+| 自動條件整體通過 | 25 / 25 |
+| 平均端到端延遲 | 5,756 ms |
+| P50 端到端延遲 | 4,994 ms |
+| P95 端到端延遲 | 8,287 ms |
+| Input / Output tokens | 34,664 / 4,581 |
+| Estimated cost | US$0.017828 |
 
 ## 指標定義
 
 - **Recall@5：**所有預期文件都出現在該題檢索結果前 5 名才算通過。沒有預期文件的拒答題不納入此分母。
 - **正確拒答率：**實際 `abstained` 是否等於測試案例的 `should_abstain`。
 - **Citation validity：**所有回傳的 citation UUID 是否都存在於該題的 top 5 檢索結果。
-- **整體通過：**該題的檢索（適用時）、拒答判斷與引用驗證全部通過。
+- **Keyword answer correctness：**非拒答案例的回答必須包含該案例標註的所有 `expected_keywords`。拒答案例不納入此分母。
+- **P50 / P95 latency：**依逐題端到端延遲計算，用來觀察平均值以外的分布。
+- **Estimated cost：**依設定的每百萬 input/output token 單價估算模型成本，作為作品集觀測值，不代表 OpenAI 帳單。
+- **整體通過：**該題的檢索（適用時）、拒答判斷、引用驗證與 keyword answer correctness 全部通過。
 
 ## 類別覆蓋
 
@@ -42,16 +48,15 @@
 
 ## 延遲觀察
 
-平均端到端延遲由 29 題探索測試的 5,551 ms 降至本次 4,588 ms，約下降 17.3%。本次最快案例為 `unknown-02`（2,506 ms），最慢為 `dish-01`（6,435 ms）。目前延遲仍主要受 OpenAI generation 與外部網路影響。
+25 題核心評估的平均端到端延遲為 5,756 ms，P50 為 4,994 ms，P95 為 8,287 ms。延遲仍主要受 OpenAI generation、外部網路與 Supabase 連線狀態影響；因此報告同時呈現平均值與 P95，避免只看平均值而忽略尾端慢請求。
 
 ## 結果解讀限制
 
-31/31 代表目前定義的自動工程條件全部通過，不代表答案語意正確率已達 100%。現有評估尚未逐題保存 `expected_answer` 或 `expected_keywords`，因此回答內容仍需要人工抽查。後續可增加：
+25/25 代表目前定義的自動工程條件全部通過。Keyword correctness 能檢查預期事實是否出現在回答中，但不代表完整語意正確率已達 100%。後續可增加：
 
-- `expected_keywords` 或結構化 expected facts
+- 結構化 expected facts
 - 人工標註的 answer correctness
 - 多次執行以觀察模型輸出變異
-- P50、P95 latency 與 Token 成本
 - 隔離測試資料庫中的真實來源衝突測試
 
 ## 失敗案例

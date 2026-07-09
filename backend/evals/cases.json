@@ -1,192 +1,239 @@
 [
   {
     "id": "allergen-01",
-    "question": "花生過敏可以吃青醬義大利麵嗎？",
+    "question": "堅果過敏可以吃青醬義大利麵嗎？",
     "branch_id": "taipei",
     "expected_document": "全店菜單與過敏原指南",
-    "should_abstain": false
+    "should_abstain": false,
+    "expected_keywords": [
+      "腰果"
+    ]
   },
   {
     "id": "allergen-02",
     "question": "番茄蔬菜湯含乳製品嗎？",
     "branch_id": "taichung",
     "expected_document": "全店菜單與過敏原指南",
-    "should_abstain": false
+    "should_abstain": false,
+    "expected_keywords": [
+      "番茄蔬菜湯",
+      "不含",
+      "乳製品"
+    ]
   },
   {
     "id": "allergen-03",
     "question": "凱薩醬有哪些常見過敏原？",
     "branch_id": "taipei",
     "expected_document": "全店菜單與過敏原指南",
-    "should_abstain": false
+    "should_abstain": false,
+    "expected_keywords": [
+      "凱薩醬",
+      "蛋",
+      "鯷魚"
+    ]
   },
   {
     "id": "recipe-01",
     "question": "鮭魚中心溫度最低要幾度？",
     "branch_id": "taipei",
     "expected_document": "菜單製作與出餐標準",
-    "should_abstain": false
+    "should_abstain": false,
+    "expected_keywords": [
+      "鮭魚",
+      "63°C"
+    ]
   },
   {
     "id": "recipe-02",
     "question": "牛肉漢堡正常多久要出餐？",
     "branch_id": "taichung",
     "expected_document": "菜單製作與出餐標準",
-    "should_abstain": false
-  },
-  {
-    "id": "recipe-03",
-    "question": "番茄湯開封可以保存多久？",
-    "branch_id": "taipei",
-    "expected_document": "菜單製作與出餐標準",
-    "should_abstain": false
+    "should_abstain": false,
+    "expected_keywords": [
+      "牛肉漢堡",
+      "12 分鐘"
+    ]
   },
   {
     "id": "safety-01",
     "question": "冷藏設備應維持幾度？",
     "branch_id": "taichung",
     "expected_document": "食品安全與溫度管理",
-    "should_abstain": false
+    "should_abstain": false,
+    "expected_keywords": [
+      "冷藏設備",
+      "0°C",
+      "7°C"
+    ]
   },
   {
     "id": "safety-02",
     "question": "生肉要使用什麼顏色的砧板？",
     "branch_id": "taipei",
     "expected_document": "食品安全與溫度管理",
-    "should_abstain": false
+    "should_abstain": false,
+    "expected_keywords": [
+      "紅色砧板",
+      "生肉"
+    ]
   },
   {
-    "id": "safety-03",
-    "question": "熟食保溫最低溫度是多少？",
+    "id": "safety-04",
+    "question": "大量熟食冷卻時，兩小時內要降到幾度？",
     "branch_id": "taipei",
     "expected_document": "食品安全與溫度管理",
-    "should_abstain": false
+    "should_abstain": false,
+    "expected_keywords": [
+      "21°C",
+      "兩小時"
+    ]
   },
   {
     "id": "fryer-01",
     "question": "炸爐每日過濾前油溫要降到多少？",
     "branch_id": "taichung",
     "expected_document": "炸爐清潔與換油 SOP",
-    "should_abstain": false
-  },
-  {
-    "id": "fryer-02",
-    "question": "炸爐什麼時候深度清潔？",
-    "branch_id": "taipei",
-    "expected_document": "炸爐清潔與換油 SOP",
-    "should_abstain": false
+    "should_abstain": false,
+    "expected_keywords": [
+      "60°C 以下"
+    ]
   },
   {
     "id": "dish-01",
     "question": "洗碗機最終沖洗溫度至少幾度？",
     "branch_id": "taipei",
     "expected_document": "洗碗機操作手冊",
-    "should_abstain": false
-  },
-  {
-    "id": "dish-02",
-    "question": "洗完的杯子可以用抹布擦乾嗎？",
-    "branch_id": "taichung",
-    "expected_document": "洗碗機操作手冊",
-    "should_abstain": false
+    "should_abstain": false,
+    "expected_keywords": [
+      "82°C"
+    ]
   },
   {
     "id": "complaint-01",
     "question": "客人疑似過敏而呼吸困難要怎麼辦？",
     "branch_id": "taipei",
     "expected_document": "客訴與退款處理",
-    "should_abstain": false
-  },
-  {
-    "id": "complaint-02",
-    "question": "信用卡退款多久會顯示？",
-    "branch_id": "taichung",
-    "expected_document": "客訴與退款處理",
-    "should_abstain": false
+    "should_abstain": false,
+    "expected_keywords": [
+      "119",
+      "值班主管"
+    ]
   },
   {
     "id": "opening-01",
     "question": "開店發現瓦斯味可以先開燈檢查嗎？",
     "branch_id": "taipei",
     "expected_document": "全店開店共同流程",
-    "should_abstain": false
+    "should_abstain": false,
+    "expected_keywords": [
+      "瓦斯味",
+      "電器"
+    ]
   },
   {
     "id": "closing-01",
     "question": "收銀差多少錢要通知主管？",
     "branch_id": "taichung",
     "expected_document": "全店打烊共同流程",
-    "should_abstain": false
+    "should_abstain": false,
+    "expected_keywords": [
+      "差異超過新台幣 100 元",
+      "通知主管"
+    ]
   },
   {
     "id": "emergency-01",
     "question": "油鍋起火可以潑水嗎？",
     "branch_id": "taipei",
     "expected_document": "緊急事故應變指南",
-    "should_abstain": false
+    "should_abstain": false,
+    "expected_keywords": [
+      "不可以"
+    ]
   },
   {
-    "id": "emergency-02",
-    "question": "停電時冷藏庫門要怎麼處理？",
-    "branch_id": "taichung",
+    "id": "emergency-03",
+    "question": "地震時可以搭電梯離開嗎？",
+    "branch_id": "taipei",
     "expected_document": "緊急事故應變指南",
-    "should_abstain": false
+    "should_abstain": false,
+    "expected_keywords": [
+      "搭乘電梯"
+    ]
   },
   {
     "id": "reservation-01",
     "question": "訂位遲到多久會轉候位？",
     "branch_id": "taipei",
     "expected_document": "訂位與候位規則",
-    "should_abstain": false
-  },
-  {
-    "id": "reservation-02",
-    "question": "候位叫號三次沒到怎麼處理？",
-    "branch_id": "taichung",
-    "expected_document": "訂位與候位規則",
-    "should_abstain": false
+    "should_abstain": false,
+    "expected_keywords": [
+      "15 分鐘",
+      "現場候位"
+    ]
   },
   {
     "id": "taipei-01",
     "question": "台北店星期六最後點餐幾點？",
     "branch_id": "taipei",
     "expected_document": "台北店打烊補充 SOP",
-    "should_abstain": false
+    "should_abstain": false,
+    "expected_keywords": [
+      "21:30"
+    ]
   },
   {
-    "id": "taipei-02",
-    "question": "台北店早班從哪個入口進入？",
+    "id": "taipei-03",
+    "question": "台北店戶外座位在降雨機率多少以下才可擺設？",
     "branch_id": "taipei",
     "expected_document": "台北店開店補充 SOP",
-    "should_abstain": false
+    "should_abstain": false,
+    "expected_keywords": [
+      "60%"
+    ]
   },
   {
-    "id": "taichung-01",
-    "question": "台中店星期日最後點餐幾點？",
+    "id": "taichung-03",
+    "question": "台中店早班人員從哪裡進入？",
     "branch_id": "taichung",
-    "expected_document": "台中店打烊補充 SOP",
-    "should_abstain": false
+    "expected_document": "台中店開店補充 SOP",
+    "should_abstain": false,
+    "expected_keywords": [
+      "停車場側門"
+    ]
   },
   {
-    "id": "taichung-02",
-    "question": "台中店兒童遊戲區幾點關閉？",
+    "id": "taichung-05",
+    "question": "台中店打烊後垃圾要集中在哪裡？",
     "branch_id": "taichung",
     "expected_document": "台中店打烊補充 SOP",
-    "should_abstain": false
+    "should_abstain": false,
+    "expected_keywords": [
+      "冷藏垃圾間"
+    ]
   },
   {
     "id": "pos-01",
     "question": "POS 離線時如何記錄訂單？",
     "branch_id": "taipei",
     "expected_document": "POS 點餐與結帳操作",
-    "should_abstain": false
+    "should_abstain": false,
+    "expected_keywords": [
+      "POS 離線",
+      "編號紙本單",
+      "補登"
+    ]
   },
   {
-    "id": "hygiene-01",
-    "question": "員工洗手至少要搓洗多久？",
+    "id": "hygiene-03",
+    "question": "手套可以取代洗手嗎？",
     "branch_id": "taichung",
     "expected_document": "餐廳員工手冊標準",
-    "should_abstain": false
+    "should_abstain": false,
+    "expected_keywords": [
+      "不能"
+    ]
   },
   {
     "id": "compound-01",
@@ -196,27 +243,28 @@
       "台北店打烊補充 SOP",
       "全店菜單與過敏原指南"
     ],
-    "should_abstain": false
+    "should_abstain": false,
+    "expected_keywords": [
+      "21:30",
+      "香煎鮭魚",
+      "花生",
+      "交叉接觸"
+    ]
   },
   {
     "id": "unknown-01",
     "question": "員工今年年終獎金有幾個月？",
     "branch_id": "taipei",
     "expected_document": null,
-    "should_abstain": true
+    "should_abstain": true,
+    "expected_keywords": []
   },
   {
-    "id": "unknown-02",
-    "question": "附近哪一間電影院最好看？",
+    "id": "unknown-04",
+    "question": "明天台中店會不會下雨？",
     "branch_id": "taichung",
     "expected_document": null,
-    "should_abstain": true
-  },
-  {
-    "id": "unknown-03",
-    "question": "老闆的手機號碼是多少？",
-    "branch_id": "taipei",
-    "expected_document": null,
-    "should_abstain": true
+    "should_abstain": true,
+    "expected_keywords": []
   }
 ]

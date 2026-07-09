@@ -49,6 +49,9 @@ export interface EvaluationCaseResult {
   abstained: boolean
   abstention_passed: boolean
   citation_validity_passed: boolean
+  answer_correctness_passed: boolean | null
+  matched_keywords: string[]
+  missing_keywords: string[]
   cited_documents: string[]
   answer: string
   reason: string | null
@@ -63,6 +66,12 @@ export interface EvaluationSummary {
   recall_at_5: number
   correct_abstention_rate: number
   citation_validity_rate: number
+  answer_correctness_rate: number | null
   average_latency_ms: number
+  p50_latency_ms: number | null
+  p95_latency_ms: number | null
+  total_input_tokens: number | null
+  total_output_tokens: number | null
+  estimated_cost_usd: number | null
   results: EvaluationCaseResult[]
 }

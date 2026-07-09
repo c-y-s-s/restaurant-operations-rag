@@ -52,6 +52,7 @@ def test_migration_runner_is_idempotent() -> None:
         "002_citation_snapshots",
         "003_document_source_id",
         "004_evaluation_runs",
+        "005_evaluation_quality_metrics",
     ]
     assert second == []
     assert database.fake_connection.rollbacks == 0

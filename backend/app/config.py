@@ -22,6 +22,8 @@ class Settings(BaseSettings):
     retrieval_min_semantic_score: float = 0.28
     retrieval_candidates: int = 8
     generation_context_chunks: int = 5
+    openai_chat_input_cost_per_1m_tokens: float = 0.25
+    openai_chat_output_cost_per_1m_tokens: float = 2.00
 
     @field_validator("allowed_origins", mode="before")
     @classmethod

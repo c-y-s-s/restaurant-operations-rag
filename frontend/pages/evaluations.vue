@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { EvaluationCaseResult, EvaluationSummary } from '~/types/api'
+import type { EvaluationSummary } from '~/types/api'
+import { buildScoreCards, formatCost, passLabel, uniqueDocuments } from '~/utils/evaluation-report'
 import { getApiErrorMessage } from '~/utils/api-error'
 
 const config = useRuntimeConfig()
@@ -20,28 +21,7 @@ onMounted(() => {
 
 const scoreCards = computed(() => {
   if (!report.value) return []
-  return [
-    {
-      label: 'Recall@5',
-      value: formatPercent(report.value.recall_at_5),
-      helper: '預期文件是否出現在前 5 筆檢索結果'
-    },
-    {
-      label: 'Citation validity',
-      value: formatPercent(report.value.citation_validity_rate),
-      helper: '引用 chunk 是否都來自本次 context'
-    },
-    {
-      label: 'Abstention',
-      value: formatPercent(report.value.correct_abstention_rate),
-      helper: '該拒答與不該拒答是否判斷正確'
-    },
-    {
-      label: 'Avg latency',
-      value: `${Math.round(report.value.average_latency_ms).toLocaleString()} ms`,
-      helper: '測試集平均回應時間'
-    }
-  ]
+  return buildScoreCards(report.value)
 })
 
 const passedCases = computed(() => report.value?.results.filter(item => item.overall_passed).length ?? 0)
@@ -79,10 +59,6 @@ function clearSecret() {
   localStorage.removeItem(STORAGE_KEY)
 }
 
-function formatPercent(value: number) {
-  return `${Math.round(value * 100)}%`
-}
-
 function formatDate(value: string | null) {
   if (!value) return '尚無執行時間'
   return new Intl.DateTimeFormat('zh-TW', {
@@ -99,14 +75,6 @@ function branchLabel(branchId: string) {
   }[branchId] ?? branchId
 }
 
-function passLabel(value: boolean | null) {
-  if (value === null) return '未檢查'
-  return value ? '通過' : '未通過'
-}
-
-function uniqueDocuments(caseResult: EvaluationCaseResult) {
-  return [...new Set([...caseResult.retrieved_documents, ...caseResult.cited_documents])]
-}
 </script>
 
 <template>
@@ -172,7 +140,8 @@ function uniqueDocuments(caseResult: EvaluationCaseResult) {
             <h3>{{ formatDate(report.created_at) }}</h3>
             <p class="summary-meta">
               Run ID：{{ report.run_id ?? 'N/A' }} · 測試 {{ report.cases }} 題 ·
-              通過 {{ passedCases }} 題 / 未通過 {{ failedCases }} 題
+              通過 {{ passedCases }} 題 / 未通過 {{ failedCases }} 題 ·
+              估算成本 {{ formatCost(report.estimated_cost_usd) }}
             </p>
           </div>
         </section>
@@ -219,6 +188,9 @@ function uniqueDocuments(caseResult: EvaluationCaseResult) {
               <span :class="{ fail: !caseResult.citation_validity_passed }">
                 Citation：{{ passLabel(caseResult.citation_validity_passed) }}
               </span>
+              <span :class="{ fail: caseResult.answer_correctness_passed === false }">
+                Answer：{{ passLabel(caseResult.answer_correctness_passed) }}
+              </span>
             </div>
 
             <details>
@@ -228,6 +200,12 @@ function uniqueDocuments(caseResult: EvaluationCaseResult) {
                 <p v-if="caseResult.reason"><strong>拒答原因</strong>{{ caseResult.reason }}</p>
                 <p><strong>預期文件</strong>{{ caseResult.expected_documents.join('、') || '無' }}</p>
                 <p><strong>檢索/引用文件</strong>{{ uniqueDocuments(caseResult).join('、') || '無' }}</p>
+                <p v-if="caseResult.matched_keywords.length">
+                  <strong>命中關鍵字</strong>{{ caseResult.matched_keywords.join('、') }}
+                </p>
+                <p v-if="caseResult.missing_keywords.length" class="missing-keywords">
+                  <strong>缺少關鍵字</strong>{{ caseResult.missing_keywords.join('、') }}
+                </p>
               </div>
             </details>
           </article>
